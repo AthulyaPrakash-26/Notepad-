@@ -7,7 +7,9 @@ import java.awt.EventQueue;
 import javax.swing.JFrame;
 import javax.swing.JMenu;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
+import javax.swing.JTextArea;
 import javax.swing.UIManager;
 
 import javax.swing.undo.UndoManager;
@@ -27,10 +29,16 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
+import javax.swing.text.Element;
+
 public class NotepadHome extends JFrame {
 
-	private JEditorPane editorPane;
 	private StringBuffer buffer;
+	private static JTextArea textArea;
+	private static JTextArea lines;
+	private static NotepadHome frame;
 
 	/**
 	 * Launch the application.
@@ -39,7 +47,7 @@ public class NotepadHome extends JFrame {
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
 				try {
-					NotepadHome frame = new NotepadHome();
+					frame = new NotepadHome();
 					frame.setVisible(true);
 				} catch (Exception e) {
 					e.printStackTrace();
@@ -64,16 +72,8 @@ public class NotepadHome extends JFrame {
 		JTabbedPane tabbedPane = new JTabbedPane(JTabbedPane.TOP);
 		getContentPane().add(tabbedPane, BorderLayout.CENTER);
 
-		editorPane = new JEditorPane();
-		editorPane.setBounds(53, 0, 993, 716);
-		// editorScrollPane = new JScrollPane(editorPane);
-		// editorScrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
-		// editorScrollPane.setPreferredSize(new Dimension(250, 145));
-		// editorScrollPane.setMinimumSize(new Dimension(10, 10));
-
 		JPanel panel = new JPanel();
-		tabbedPane.addTab("New tab", null, panel, null);
-		panel.add(editorPane);
+		tabbedPane.addTab("New tab", null, new JPanel().add(new JEditorPane()), null);
 
 		JMenu mnFile = new JMenu("File");
 		mnFile.setForeground(new Color(0, 0, 0));
@@ -83,22 +83,21 @@ public class NotepadHome extends JFrame {
 		mntmNew.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_N, InputEvent.CTRL_MASK));
 		mntmNew.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				JPanel panel1 = new JPanel();
-				tabbedPane.addTab("New tab1", null, panel1, null);
-				JEditorPane editorPane1 = new JEditorPane();
-				editorPane1.setBounds(53, 0, 993, 716);
-				panel1.add(editorPane1);
+				tabbedPane.addTab("New tab", null, new JPanel().add(new JEditorPane()), null);
+				tabbedPane.setSelectedIndex(tabbedPane.getTabCount() - 1);
 				for (int i = 0; i < tabbedPane.getTabCount(); i++) {
 					TabClose tabHeader = new TabClose(tabbedPane, i);
 					tabHeader.apply();
 
 				}
+
 			}
 		});
 		mnFile.add(mntmNew);
 
 		JMenuItem mntmOpen = new JMenuItem("open");
 		mntmOpen.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_O, InputEvent.CTRL_MASK));
+
 		mntmOpen.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent ae) {
 
@@ -108,8 +107,6 @@ public class NotepadHome extends JFrame {
 				fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
 				int result = fileChooser.showOpenDialog(null);
 				if (result == JFileChooser.APPROVE_OPTION) {
-
-					tabbedPane.addTab("New tab2", null, panel, null);
 					String filePath = fileChooser.getSelectedFile().getPath();
 
 					try {
@@ -121,11 +118,14 @@ public class NotepadHome extends JFrame {
 						String line = null;
 						while ((line = reader.readLine()) != null) {
 
-							buffer.append(line);
+							buffer.append("\n" + line);
 						}
 
 						reader.close();
-						editorPane.setText(buffer.toString());
+						JEditorPane editorPane1 = new JEditorPane();
+						tabbedPane.addTab("New tab", null, new JPanel().add(editorPane1), null);
+						tabbedPane.setSelectedIndex(tabbedPane.getTabCount() - 1);
+						editorPane1.setText(buffer.toString());
 
 					} catch (IOException e) {
 						e.printStackTrace();
@@ -157,14 +157,12 @@ public class NotepadHome extends JFrame {
 			}
 		});
 		mnFile.add(mntmExit);
-
+		
 		JMenu mnEdit = new JMenu("Edit");
 		mnEdit.setForeground(new Color(0, 0, 0));
 		menuBar.add(mnEdit);
 
 		UndoManager undoManager = new UndoManager();
-		// JTextField txtField.getDocument().addUndoableEditListener(undoManager);
-
 		JMenuItem mntmUndo = new JMenuItem("Undo");
 		mntmUndo.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
@@ -183,7 +181,7 @@ public class NotepadHome extends JFrame {
 		JMenuItem mntmCut = new JMenuItem("Cut");
 		mntmCut.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				editorPane.cut();
+				// editorPane.cut();
 			}
 		});
 		mntmCut.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_X, InputEvent.CTRL_MASK));
@@ -192,7 +190,9 @@ public class NotepadHome extends JFrame {
 		JMenuItem mntmCopy = new JMenuItem("Copy");
 		mntmCopy.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				editorPane.copy();
+				int selectedIndex = tabbedPane.getSelectedIndex();
+				System.out.println("Default Index:" + selectedIndex);
+				// editorPane.copy();
 			}
 		});
 		mntmCopy.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_C, InputEvent.CTRL_MASK));
@@ -201,7 +201,7 @@ public class NotepadHome extends JFrame {
 		JMenuItem mntmPaste = new JMenuItem("Paste");
 		mntmPaste.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				editorPane.paste();
+				// editorPane.paste();
 			}
 		});
 		mntmPaste.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_V, InputEvent.CTRL_MASK));
