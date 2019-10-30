@@ -63,8 +63,7 @@ private static RowHighlighter rh;
 			public void run() {
 				try {
 					frame = new NotepadHome1();
-					frame.setVisible(true);
-					// frame.add(new RowHighlighter());
+					frame.setVisible(true);					
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
@@ -86,10 +85,12 @@ private static RowHighlighter rh;
 		setJMenuBar(menuBar);
 
 		JTabbedPane tabbedPane = new JTabbedPane(JTabbedPane.TOP);
+		tabbedPane.setTabLayoutPolicy(JTabbedPane.SCROLL_TAB_LAYOUT);
 		getContentPane().add(tabbedPane, BorderLayout.CENTER);
+		
 
 		JPanel panel = new JPanel();
-		TextEditor edit = new TextEditor();
+//		TextEditor edit = new TextEditor();
 		tabbedPane.addTab("New tab", null, new JPanel().add(new RowHighlighter()), null);
 
 		JMenu mnFile = new JMenu("File");
@@ -150,7 +151,7 @@ private static RowHighlighter rh;
 						tabbedPane.setSelectedIndex(tabbedPane.getTabCount() - 1);
 						rh.setText(buffer.toString());
 						//editorPane1.add(new RowHighlighter());
-
+						
 					} catch (IOException e) {
 						e.printStackTrace();
 					}
@@ -188,6 +189,13 @@ private static RowHighlighter rh;
 		mnFile.add(mntmSaveAs);
 
 		JMenuItem mntmClose = new JMenuItem("Close");
+		mntmClose.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				 int selectedIndex = tabbedPane.getSelectedIndex();
+			        System.out.println("Default Index:" + selectedIndex);
+				tabbedPane.remove(selectedIndex);
+			}
+		});
 		mntmClose.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_W, InputEvent.CTRL_MASK));
 		mnFile.add(mntmClose);
 
@@ -198,6 +206,17 @@ private static RowHighlighter rh;
 				System.exit(0);
 			}
 		});
+		
+		JMenuItem mntmCloseAll = new JMenuItem("Close All");
+		mntmCloseAll.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				while (tabbedPane.getTabCount() > 1) {
+				    tabbedPane.remove(1);
+				}
+				
+			}
+		});
+		mnFile.add(mntmCloseAll);
 		mnFile.add(mntmExit);
 		
 		JMenu mnEdit = new JMenu("Edit");
