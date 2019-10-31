@@ -2,12 +2,8 @@ package view;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
-import java.awt.Component;
 import java.awt.EventQueue;
 import java.awt.Font;
-import java.awt.Toolkit;
-import java.awt.datatransfer.Clipboard;
-import java.awt.datatransfer.StringSelection;
 
 import javax.swing.JFrame;
 import javax.swing.JMenu;
@@ -15,7 +11,6 @@ import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
-import javax.swing.JTextArea;
 import javax.swing.UIManager;
 import javax.swing.undo.CannotUndoException;
 import javax.swing.undo.UndoManager;
@@ -31,7 +26,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.InputEvent;
 
-import javax.swing.AbstractAction;
+import javax.swing.ImageIcon;
 import javax.swing.JDialog;
 import javax.swing.JEditorPane;
 
@@ -55,8 +50,6 @@ public class NotepadHome extends JFrame {
 
 	// private static JEditorPane editorPane;
 	private StringBuffer buffer;
-	private static JTextArea textArea;
-	private static JTextArea lines;
 	private static NotepadHome frame;
 	private static JTabbedPane tabbedPane;
 	private static Highlighter.HighlightPainter myHighlightPainter;
@@ -96,7 +89,7 @@ public class NotepadHome extends JFrame {
 		getContentPane().add(tabbedPane, BorderLayout.CENTER);
 
 		JPanel panel = new JPanel();
-		tabbedPane.addTab("New tab 1", null, new JPanel().add(new RowHighlighter()), null);
+		tabbedPane.addTab("New tab ", null, new JPanel().add(new RowHighlighter()), null);
 		tabbedPane.setSelectedIndex(tabbedPane.getTabCount() - 1);
 
 		JMenu mnFile = new JMenu("File");
@@ -105,12 +98,14 @@ public class NotepadHome extends JFrame {
 
 		JMenuItem mntmNew = new JMenuItem("New");
 		mntmNew.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_N, InputEvent.CTRL_MASK));
+		mntmNew.setIcon(new ImageIcon("C:\\Users\\1026808\\eclipse-workspace\\Notepad\\src\\view"));
 		mntmNew.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 
 				tabbedPane.addTab("New tab", null, new JPanel().add(new RowHighlighter()), null);
 				tabbedPane.setSelectedIndex(tabbedPane.getTabCount() - 1);
-				for (int i = 0; i < tabbedPane.getTabCount(); i++) {
+				for (int i = 1; i < tabbedPane.getTabCount(); i++) {
+					tabbedPane.getTabComponentAt(0);
 					TabClose tabHeader = new TabClose(tabbedPane, i);
 					tabHeader.apply();
 				}
@@ -170,6 +165,11 @@ public class NotepadHome extends JFrame {
 		JMenu mntmopenFolder = new JMenu("open Containing Folder");
 		mnFile.add(mntmopenFolder);
 		JMenuItem explorer = new JMenuItem("Explorer");
+		explorer.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+
+			}
+		});
 		mntmopenFolder.add(explorer);
 		JMenuItem cmd = new JMenuItem("cmd");
 		cmd.addActionListener(new ActionListener() {
@@ -184,6 +184,13 @@ public class NotepadHome extends JFrame {
 		mntmopenFolder.add(cmd);
 
 		JMenuItem mntmSaveAs = new JMenuItem("Save As");
+		mntmSaveAs.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				SaveAs sa = new SaveAs();
+				sa.saveAs((JEditorPane) tabbedPane.getSelectedComponent());
+				dispose();
+			}
+		});
 		mntmSaveAs.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_S, InputEvent.CTRL_MASK | InputEvent.ALT_MASK));
 		mnFile.add(mntmSaveAs);
 
@@ -218,7 +225,7 @@ public class NotepadHome extends JFrame {
 			}
 		});
 		mnFile.add(mntmExit);
-		
+
 		JMenu mnEdit = new JMenu("Edit");
 		mnEdit.setForeground(new Color(0, 0, 0));
 		menuBar.add(mnEdit);
@@ -259,7 +266,7 @@ public class NotepadHome extends JFrame {
 		mntmCut.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_X, InputEvent.CTRL_MASK));
 		mnEdit.add(mntmCut);
 		mntmCut.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent arg0) {
+			public void actionPerformed(ActionEvent e) {
 
 				JEditorPane j = (JEditorPane) tabbedPane.getSelectedComponent();
 				j.cut();
@@ -288,6 +295,20 @@ public class NotepadHome extends JFrame {
 				j.paste();
 			}
 		});
+
+		// JMenu mnCase = new JMenu("ConvertCaseTo");
+		// mnEdit.add(mnCase);
+		//
+		// JMenuItem mntmUpper = new JMenuItem("To UpperCase");
+		// mnCase.add(mntmUpper);
+		// mntmUpper.addActionListener(new ActionListener() {
+		// public void actionPerformed(ActionEvent arg0) {
+		//
+		// JEditorPane j = (JEditorPane) tabbedPane.getSelectedComponent();
+		//
+		// }
+		// });
+
 		JMenuItem mntmDelete = new JMenuItem("Delete");
 		mntmDelete.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
@@ -313,6 +334,7 @@ public class NotepadHome extends JFrame {
 		menuBar.add(mnSearch);
 
 		JMenuItem mntmFind = new JMenuItem("Find");
+		mntmFind.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_F, InputEvent.CTRL_MASK));
 		mntmFind.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				FindDialog dialog = new FindDialog();
@@ -353,7 +375,17 @@ public class NotepadHome extends JFrame {
 
 	}
 
-	public static void highlight(String searchResult) {
+	public static void close() {
+		JEditorPane editor = (JEditorPane) tabbedPane.getSelectedComponent();
+		String text = editor.getText();
+		if (text != null) {
+			int count = tabbedPane.getSelectedIndex();
+			tabbedPane.remove(count);
+		}
+
+	}
+
+	public static void highlight(String searchResult) throws Exception {
 		JEditorPane editor = (JEditorPane) tabbedPane.getSelectedComponent();
 		removeHighlights(editor);
 
@@ -362,7 +394,7 @@ public class NotepadHome extends JFrame {
 			Document doc = editor.getDocument();
 			String text = doc.getText(0, doc.getLength());
 			if (!text.toLowerCase().contains(searchResult.toLowerCase())) {
-				FindDialog dialog = new FindDialog();
+				throw new Exception("String Not Found");
 			}
 			int pos = 0;
 			while ((pos = text.toUpperCase().indexOf(searchResult.toUpperCase(), pos)) >= 0) {
@@ -390,5 +422,9 @@ public class NotepadHome extends JFrame {
 		public MyHighlightPainter(Color color) {
 			super(color);
 		}
+	}
+
+	public static JEditorPane getTabbedPane() {
+		return (JEditorPane) tabbedPane.getSelectedComponent();
 	}
 }
