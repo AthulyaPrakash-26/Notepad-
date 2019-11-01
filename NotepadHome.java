@@ -6,6 +6,7 @@ import java.awt.EventQueue;
 import java.awt.Font;
 
 import javax.swing.JFrame;
+import javax.swing.JLabel;
 import javax.swing.JMenu;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
@@ -16,6 +17,7 @@ import javax.swing.undo.CannotUndoException;
 import javax.swing.undo.UndoManager;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
 import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
 
@@ -39,6 +41,8 @@ import java.io.InputStreamReader;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
+import javax.swing.event.CaretEvent;
+import javax.swing.event.CaretListener;
 import javax.swing.event.UndoableEditEvent;
 import javax.swing.event.UndoableEditListener;
 import javax.swing.text.BadLocationException;
@@ -53,9 +57,6 @@ public class NotepadHome extends JFrame {
 	private static JTabbedPane tabbedPane;
 	private static Highlighter.HighlightPainter myHighlightPainter;
 
-	/**
-	 * Launch the application.
-	 */
 	public static void main(String[] args) {
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
@@ -69,9 +70,6 @@ public class NotepadHome extends JFrame {
 		});
 	}
 
-	/**
-	 * Create the frame.
-	 */
 	public NotepadHome() {
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setBounds(100, 100, 1067, 804);
@@ -85,7 +83,9 @@ public class NotepadHome extends JFrame {
 		setJMenuBar(menuBar);
 
 		tabbedPane = new JTabbedPane(JTabbedPane.TOP);
-		getContentPane().add(tabbedPane, BorderLayout.CENTER);
+		JScrollPane sp1 = new JScrollPane(tabbedPane, JScrollPane.VERTICAL_SCROLLBAR_ALWAYS,
+				JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS);
+		getContentPane().add(sp1, BorderLayout.CENTER);
 
 		JPanel panel = new JPanel();
 		tabbedPane.addTab("New tab ", null, new JPanel().add(new RowHighlighter()), null);
@@ -100,7 +100,6 @@ public class NotepadHome extends JFrame {
 		mntmNew.setIcon(new ImageIcon("C:\\Users\\1026808\\eclipse-workspace\\Notepad\\src\\view"));
 		mntmNew.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-
 				tabbedPane.addTab("New tab", null, new JPanel().add(new RowHighlighter()), null);
 				tabbedPane.setSelectedIndex(tabbedPane.getTabCount() - 1);
 				for (int i = 1; i < tabbedPane.getTabCount(); i++) {
@@ -114,7 +113,6 @@ public class NotepadHome extends JFrame {
 
 		JMenuItem mntmOpen = new JMenuItem("open");
 		mntmOpen.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_O, InputEvent.CTRL_MASK));
-
 		mntmOpen.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent ae) {
 
@@ -308,6 +306,47 @@ public class NotepadHome extends JFrame {
 		});
 		mnEdit.add(mntmSelect);
 
+		JMenu mnCase = new JMenu("Convert Case To");
+		mnEdit.add(mnCase);
+
+		JMenuItem mntmUpper = new JMenuItem("Upper Case");
+		mntmUpper.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+
+				JEditorPane j = (JEditorPane) tabbedPane.getSelectedComponent();
+				int start = j.getSelectionStart();
+				int end = j.getSelectionEnd();
+				String str = j.getText();
+				String subString = str.substring(start, end);
+				String text = subString.toUpperCase();
+
+				String startText = j.getText().substring(0, start);
+				String endText = j.getText().substring(end, j.getText().length());
+				j.setText(startText + text + endText);
+
+			}
+		});
+		mnCase.add(mntmUpper);
+
+		JMenuItem mntmLower = new JMenuItem("Lower Case");
+		mntmLower.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+
+				JEditorPane j = (JEditorPane) tabbedPane.getSelectedComponent();
+				int start = j.getSelectionStart();
+				int end = j.getSelectionEnd();
+				String str = j.getText();
+				String subString = str.substring(start, end);
+				String text = subString.toLowerCase();
+
+				String startText = j.getText().substring(0, start);
+				String endText = j.getText().substring(end, j.getText().length());
+				j.setText(startText + text + endText);
+
+			}
+		});
+		mnCase.add(mntmLower);
+
 		JMenu mnSearch = new JMenu("Search");
 		mnEdit.setForeground(new Color(0, 0, 0));
 		menuBar.add(mnSearch);
@@ -357,6 +396,7 @@ public class NotepadHome extends JFrame {
 				}
 			}
 		});
+
 	}
 
 	public static void close() {
