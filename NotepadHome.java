@@ -48,7 +48,6 @@ import javax.swing.text.Highlighter;
 
 public class NotepadHome extends JFrame {
 
-	// private static JEditorPane editorPane;
 	private StringBuffer buffer;
 	private static NotepadHome frame;
 	private static JTabbedPane tabbedPane;
@@ -78,7 +77,7 @@ public class NotepadHome extends JFrame {
 		setBounds(100, 100, 1067, 804);
 		this.setTitle("Notepad++");
 
-		myHighlightPainter = new MyHighlightPainter(Color.yellow);
+		myHighlightPainter = new MyHighlightPainter(Color.green);
 
 		JMenuBar menuBar = new JMenuBar();
 		menuBar.setBounds(0, 0, 1051, 29);
@@ -145,10 +144,9 @@ public class NotepadHome extends JFrame {
 						tabbedPane.addTab(fileName.toString(), null, new JPanel().add(rh), null);
 						tabbedPane.setSelectedIndex(tabbedPane.getTabCount() - 1);
 						rh.setText(buffer.toString());
-						for (int i = 0; i < tabbedPane.getTabCount(); i++) {
+						for (int i = 1; i < tabbedPane.getTabCount(); i++) {
 							TabClose tabHeader = new TabClose(tabbedPane, i);
 							tabHeader.apply();
-
 						}
 
 					} catch (IOException e) {
@@ -164,13 +162,7 @@ public class NotepadHome extends JFrame {
 
 		JMenu mntmopenFolder = new JMenu("open Containing Folder");
 		mnFile.add(mntmopenFolder);
-		JMenuItem explorer = new JMenuItem("Explorer");
-		explorer.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent arg0) {
 
-			}
-		});
-		mntmopenFolder.add(explorer);
 		JMenuItem cmd = new JMenuItem("cmd");
 		cmd.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
@@ -296,19 +288,6 @@ public class NotepadHome extends JFrame {
 			}
 		});
 
-		// JMenu mnCase = new JMenu("ConvertCaseTo");
-		// mnEdit.add(mnCase);
-		//
-		// JMenuItem mntmUpper = new JMenuItem("To UpperCase");
-		// mnCase.add(mntmUpper);
-		// mntmUpper.addActionListener(new ActionListener() {
-		// public void actionPerformed(ActionEvent arg0) {
-		//
-		// JEditorPane j = (JEditorPane) tabbedPane.getSelectedComponent();
-		//
-		// }
-		// });
-
 		JMenuItem mntmDelete = new JMenuItem("Delete");
 		mntmDelete.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
@@ -352,10 +331,14 @@ public class NotepadHome extends JFrame {
 						mntmUndo.setEnabled(true);
 						mntmCopy.setEnabled(true);
 						mntmPaste.setEnabled(true);
+						mntmSelect.setEnabled(true);
+						mntmDelete.setEnabled(true);
 					} else {
 						mntmUndo.setEnabled(false);
 						mntmCopy.setEnabled(false);
 						mntmPaste.setEnabled(false);
+						mntmSelect.setEnabled(false);
+						mntmDelete.setEnabled(false);
 					}
 					if (editManager.canRedo()) {
 						mntmRedo.setEnabled(true);
@@ -368,11 +351,12 @@ public class NotepadHome extends JFrame {
 					popup.add(mntmRedo);
 					popup.add(mntmCopy);
 					popup.add(mntmPaste);
+					popup.add(mntmSelect);
+					popup.add(mntmDelete);
 					popup.show(e.getComponent(), e.getX(), e.getY());
 				}
 			}
 		});
-
 	}
 
 	public static void close() {
