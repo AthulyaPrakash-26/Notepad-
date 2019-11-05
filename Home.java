@@ -38,11 +38,11 @@ public class Home extends JFrame {
 	private JPanel contentPane;
 	private static Home frame;
 	private static JTable tProduct;
-	private static DefaultTableModel dtmProduct;
+	private static DefaultTableModel dtmProduct = new DefaultTableModel(new String[] { "Product Name", "Price" }, 0);
 	private static JComboBox<String> comboBox;
-	private ViewCartDialog dialog;
+	private JLabel lblName;
 	int i;
-	private JTextField textField;
+
 	/**
 	 * Launch the application.
 	 */
@@ -73,65 +73,65 @@ public class Home extends JFrame {
 		JMenuBar menuBar = new JMenuBar();
 		menuBar.setBounds(0, 0, 904, 32);
 		contentPane.add(menuBar);
-		 
+
 		JMenu cartegory = new JMenu("Categories");
 		menuBar.add(cartegory);
 		JMenu orders = new JMenu("Orders");
 		menuBar.add(orders);
 		JMenu search = new JMenu("Search");
 		menuBar.add(search);
-		
 
 		JMenuItem mobiles = new JMenuItem("Mobiles");
 		mobiles.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-			    String type = mobiles.getText();
+				String type = mobiles.getText();
 				dispProduct(type);
-				textField.setText(type);
+				lblName.setText(type);
+
 			}
 		});
 		cartegory.add(mobiles);
-		
+
 		JMenuItem computers = new JMenuItem("Computers");
 		computers.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				 String type = computers.getText();
-			     dispProduct(type);
-			     textField.setText(type);
+				String type = computers.getText();
+				dispProduct(type);
+				lblName.setText(type);
 			}
 		});
 		cartegory.add(computers);
-		
+
 		JMenuItem earphones = new JMenuItem("Earphones");
 		earphones.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				String type = earphones.getText();
-			    dispProduct(type);
-			    textField.setText(type);
+				dispProduct(type);
+				lblName.setText(type);
 			}
 		});
 		cartegory.add(earphones);
-		
+
 		JMenuItem homeappliances = new JMenuItem("Home Appliances");
 		homeappliances.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				String type = homeappliances.getText();
-			    dispProduct(type);
-			    textField.setText(type);
+				dispProduct(type);
+				lblName.setText(type);
 			}
 		});
 		cartegory.add(homeappliances);
-		
-//		JMenuItem viewCart = new JMenuItem("View Cart");
-//		viewCart.addActionListener(new ActionListener() {
-//			public void actionPerformed(ActionEvent arg0) {
-////			    dialog.dispCart();
-//				new ViewCartDialog().setVisible(true);
-//				dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
-//				dialog.setVisible(true);
-//			}
-//		});
-//		cart.add(viewCart);
+
+		// JMenuItem viewCart = new JMenuItem("View Cart");
+		// viewCart.addActionListener(new ActionListener() {
+		// public void actionPerformed(ActionEvent arg0) {
+		//// dialog.dispCart();
+		// new ViewCartDialog().setVisible(true);
+		// dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
+		// dialog.setVisible(true);
+		// }
+		// });
+		// cart.add(viewCart);
 
 		JMenuItem order = new JMenuItem("Your Orders");
 		order.addActionListener(new ActionListener() {
@@ -160,78 +160,89 @@ public class Home extends JFrame {
 		JLabel lblNewLabel_1 = new JLabel("Select Quantity  :");
 		lblNewLabel_1.setBounds(485, 697, 106, 21);
 		contentPane.add(lblNewLabel_1);
-		
+
 		JButton cartButton = new JButton("Cart");
+		cartButton.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				CartDialog dialog = new CartDialog();
+				dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
+				dialog.setVisible(true);
+			}
+		});
 		cartButton.setBounds(795, 34, 89, 32);
 		contentPane.add(cartButton);
-		
+
 		JButton btnAddtoCart = new JButton("Add to Cart");
+		btnAddtoCart.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				addToCart();
+			}
+		});
 		btnAddtoCart.setBounds(714, 691, 106, 33);
 		contentPane.add(btnAddtoCart);
-		
-		textField = new JTextField();
-		textField.setBounds(43, 110, 157, 32);
-		contentPane.add(textField);
-		textField.setColumns(10);
-		
-		tProduct.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
-			@Override
-			public void valueChanged(ListSelectionEvent e) {
 
-			    i = tProduct.getSelectedRow();
-				//String value = (String) dtmProduct.getValueAt(i, 4);
-			    
-//				comboBox.removeAllItems();
-//				for (int j = 1; j <= Integer.parseInt(value); j++) {
-//					comboBox.addItem(String.valueOf(j));
-//				}
+		lblName = new JLabel("");
+		lblName.setBounds(56, 112, 128, 32);
+		contentPane.add(lblName);
+
+		tProduct.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
+			public void valueChanged(ListSelectionEvent e) {
+				System.out.println(tProduct.getSelectedRow() + "   " + tProduct.getRowCount());
+				i = tProduct.getSelectedRow();
+
+				String name = (String) dtmProduct.getValueAt(i, 0);
+				try {
+					String stock = ECommerceViewController.viewReadStock(name);
+					comboBox.removeAllItems();
+					for (int j = 1; j <= Integer.parseInt(stock); j++) {
+						comboBox.addItem(String.valueOf(j));
+					}
+				} catch (Exception e1) {
+					e1.printStackTrace();
+				}
 			}
 		});
 	}
 
 	protected void addToCart() {
 		String productId = (String) dtmProduct.getValueAt(i, 0);
-		String qnty = (String)comboBox.getSelectedItem();
+		String qnty = (String) comboBox.getSelectedItem();
 		try {
-			ECommerceViewController.insertCart(productId,qnty);
+			ECommerceViewController.insertCart(productId, qnty);
 			javax.swing.JOptionPane.showMessageDialog(frame, "Product Added to cart", "ECommerce", 2);
 		} catch (PSQLException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-			
 	}
 
 	public static void dispProduct(String category) {
 		List<Product> list = null;
 
 		try {
-			dtmProduct = new DefaultTableModel(
-					new String[] { "Product Name", "Price"}, 0);
-			dtmProduct.setRowCount(0);
-			tProduct.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-			tProduct.setModel(dtmProduct);
-			tProduct.setRowSelectionAllowed(true);
+			System.out.println(category);
+
+			// dtmProduct.setRowCount(0);
+			// tProduct.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+			// tProduct.setModel(dtmProduct);
+			// tProduct.setRowSelectionAllowed(true);
 
 			list = ECommerceViewController.viewReadByCategory(category);
 
 			if (list != null) {
 				for (int i = 0; i < list.size(); i++) {
-					Object row[] = { list.get(i).getName(), list.get(i).getPrice()};
+					Object row[] = { list.get(i).getName(), list.get(i).getPrice() };
 					dtmProduct.addRow(row);
 					tProduct.setModel(dtmProduct);
 				}
 			}
 
 		} catch (Exception e) {
+			e.printStackTrace();
 			javax.swing.JOptionPane.showMessageDialog(frame, "Product details not found", "ECommerce", 2);
 		}
 
 	}
 
-	
-	
 }

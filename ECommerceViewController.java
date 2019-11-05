@@ -39,6 +39,14 @@ public class ECommerceViewController {
 		List<Product> list = ProductDAO.readByCategory(category);
 		return list;
 	}
+	public static String viewReadStock(String name)throws Exception{
+		String str =  ProductDAO.readStock(name);
+		return str;
+	}
+	public static String viewReadPrice(String name)throws Exception{
+		String price =  ProductDAO.readPrice(name);
+		return price;
+	}
 	
 	public static void insertCart(String id,String qnty) throws PSQLException, Exception {
 		try {

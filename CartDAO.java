@@ -12,9 +12,9 @@ import model.Product;
 
 public class CartDAO {
 
-	private static String CREATESQL = "create table ProductCart (productId CHARACTER VARYING(150) NOT NULL ,Quantity CHARACTER VARYING(150))";
+	private static String CREATESQL = "create table ProductCart (productName CHARACTER VARYING(150) NOT NULL ,Quantity CHARACTER VARYING(150))";
 	private static String INSERTSQL = "insert into ProductCart values(?,?)";
-	private static String SELECTSQL 	= "select * from ProductCart";
+	private static String SELECTSQL = "select * from ProductCart";
 
 	public static void create() throws Exception {
 		Connection con = null;
@@ -33,16 +33,14 @@ public class CartDAO {
 			con.close();
 		}
 	}
-
-	public static void insert(String id,String qnty) throws Exception {
+	public static void insert(String name,String qnty) throws Exception {
 
 		Connection con = null;
 		PreparedStatement pStmt = null;
 		try {
 			con = DbConnector.getConnection();
-
 			pStmt = con.prepareStatement(INSERTSQL);
-			pStmt.setString(1, id );
+			pStmt.setString(1, name );
 			pStmt.setString(2, qnty);	
 			pStmt.executeUpdate();
 
@@ -53,7 +51,6 @@ public class CartDAO {
 
 			pStmt.close();
 			con.close();
-
 		}
 	}
 	public static List<Cart> selectAll() throws Exception {
@@ -86,8 +83,13 @@ public class CartDAO {
 	
 	public static void main(String args[]) {
 		try {
-		//	 create();
-		//	insert(new Cart("101", "asdasd"));
+			// create();
+		  //insert(new Cart("101", "asdasd"));
+			List<Cart> l=selectAll();
+			for(int i=0;i<l.size();i++)
+			{
+			System.out.println("Product: "+l.get(i).getProductName());
+			}
 		} catch (Exception ex) {
 			ex.printStackTrace();
 		}

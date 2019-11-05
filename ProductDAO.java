@@ -17,6 +17,8 @@ public class ProductDAO {
 	private static String SELECTSQL = "select * from ProductDetails";
 	private static String READBYIDSQL = "select name,price from ProductDetails where productId = ?";
 	private static String READBYCATEGORYSQL = "select name,price from ProductDetails where category = ?";
+	private static String READSTOCKSQL = "select stock from ProductDetails where name = ?";
+	private static String READPRICESQL = "select price from ProductDetails where name = ?";
 
 
 	public static void create() throws Exception {
@@ -146,15 +148,71 @@ public class ProductDAO {
 			con.close();
 		}
 	}
+	public static String readStock(String name)throws Exception{
+		Connection con = null;
+		PreparedStatement pStmt = null;
+		String stock = null;
+		try {
+			con = DbConnector.getConnection();
+			pStmt = con.prepareStatement(READSTOCKSQL);
+			pStmt.setString(1, name);
+			ResultSet rs = pStmt.executeQuery();
+			
+			boolean flag = false;
+			while (rs.next()) {
+				flag = true;
+			  stock = rs.getString(1);
+			}
+			if (!flag) {
+				throw new Exception("{Product Not Found !!!");
+			}
+			return stock;
+		}
+		catch(Exception ex) {
+			throw ex;
+		}finally {
+			pStmt.close();
+			con.close();
+		}
+	}
+	public static String readPrice(String name)throws Exception{
+		Connection con = null;
+		PreparedStatement pStmt = null;
+		String price = null;
+		try {
+			con = DbConnector.getConnection();
+			pStmt = con.prepareStatement(READPRICESQL);
+			pStmt.setString(1, name);
+			ResultSet rs = pStmt.executeQuery();
+			
+			boolean flag = false;
+			while (rs.next()) {
+				flag = true;
+			  price = rs.getString(1);
+			}
+			if (!flag) {
+				throw new Exception("{Product Not Found !!!");
+			}
+			return price;
+		}
+		catch(Exception ex) {
+			throw ex;
+		}finally {
+			pStmt.close();
+			con.close();
+		}
+	}
 
 	public static void main(String args[]) {
 		try {
 			// create();
-		List<Product> l=readByCategory("Home Appliances");
-			for(int i=0;i<l.size();i++)
-			{
-			System.out.println("Product: "+l.get(i).getName());
-			}
+//		List<Product> l=readByCategory("Home Appliances");
+//			for(int i=0;i<l.size();i++)
+//			{
+//			System.out.println("Product: "+l.get(i).getName());
+//			}
+			String str = readStock("Lenovo");
+			System.out.println(str);
 		} catch (Exception ex) {
 			ex.printStackTrace();
 		}
