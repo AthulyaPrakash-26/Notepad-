@@ -19,6 +19,7 @@ public class ProductDAO {
 	private static String READBYCATEGORYSQL = "select name,price from ProductDetails where category = ?";
 	private static String READSTOCKSQL = "select stock from ProductDetails where name = ?";
 	private static String READPRICESQL = "select price from ProductDetails where name = ?";
+	private static String READPRODUCTBYNAMESQL = "select name,price from ProductDetails where name = ?";
 
 
 	public static void create() throws Exception {
@@ -194,6 +195,34 @@ public class ProductDAO {
 				throw new Exception("{Product Not Found !!!");
 			}
 			return price;
+		}
+		catch(Exception ex) {
+			throw ex;
+		}finally {
+			pStmt.close();
+			con.close();
+		}
+	}
+	public static List<Product> readByName(String name)throws Exception{
+		Connection con = null;
+		PreparedStatement pStmt = null;
+		try {
+			con = DbConnector.getConnection();
+			pStmt = con.prepareStatement(READPRODUCTBYNAMESQL);
+			pStmt.setString(1, name);
+			
+			ResultSet rs = pStmt.executeQuery();
+			ArrayList<Product> proList = new ArrayList<>();
+			boolean flag = false;
+			while (rs.next()) {
+				flag = true;
+				Product product = new Product(rs.getString(1), rs.getString(2));
+				proList.add(product);
+			}
+			if (!flag) {
+				throw new Exception("{Product Not Found !!!");
+			}
+			return proList;
 		}
 		catch(Exception ex) {
 			throw ex;

@@ -5,6 +5,7 @@ import java.util.List;
 import org.postgresql.util.PSQLException;
 
 import dao.CartDAO;
+import dao.OrderDAO;
 import dao.ProductDAO;
 import model.Cart;
 import model.Product;
@@ -39,6 +40,10 @@ public class ECommerceViewController {
 		List<Product> list = ProductDAO.readByCategory(category);
 		return list;
 	}
+	public static List<Product> viewReadByName(String name) throws Exception {
+		List<Product> list = ProductDAO.readByName(name);
+		return list;
+	}
 	public static String viewReadStock(String name)throws Exception{
 		String str =  ProductDAO.readStock(name);
 		return str;
@@ -48,15 +53,25 @@ public class ECommerceViewController {
 		return price;
 	}
 	
-	public static void insertCart(String id,String qnty) throws PSQLException, Exception {
+	public static void insertCart(String productName,String qnty) throws PSQLException, Exception {
 		try {
-			CartDAO.insert(id,qnty);
+			CartDAO.insert(productName,qnty);
 		} catch (PSQLException e) {
 			throw e;
 		} catch (Exception e) {
 			throw e;
 		}
 	}
+	public static void insertOrder(String name,String qnty,String price,String total) throws PSQLException, Exception {
+		try {
+			OrderDAO.insert(name,qnty,price,total);
+		} catch (PSQLException e) {
+			throw e;
+		} catch (Exception e) {
+			throw e;
+		}
+	}
+	
 	public static List<Cart> viewSelectAll() throws Exception {
 		List<Cart> list = CartDAO.selectAll();
 		return list;
