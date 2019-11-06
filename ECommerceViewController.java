@@ -8,6 +8,7 @@ import dao.CartDAO;
 import dao.OrderDAO;
 import dao.ProductDAO;
 import model.Cart;
+import model.Order;
 import model.Product;
 
 public class ECommerceViewController {
@@ -28,20 +29,16 @@ public class ECommerceViewController {
 		}
 	}
 	
-	public static List<Product> viewAllProduct() throws Exception {
-		List<Product> list = ProductDAO.viewProduct();
-		return list;
-	}
-	public static List<Product> viewProduct(String pid) throws Exception {
-		List<Product> list = ProductDAO.readById(pid);
-		return list;
-	}
+//	public static List<Product> viewAllProduct() throws Exception {
+//		List<Product> list = ProductDAO.viewProduct();
+//		return list;
+//	}
+//	public static List<Product> viewProduct(String pid) throws Exception {
+//		List<Product> list = ProductDAO.readById(pid);
+//		return list;
+//	}
 	public static List<Product> viewReadByCategory(String category) throws Exception {
 		List<Product> list = ProductDAO.readByCategory(category);
-		return list;
-	}
-	public static List<Product> viewReadByName(String name) throws Exception {
-		List<Product> list = ProductDAO.readByName(name);
 		return list;
 	}
 	public static String viewReadStock(String name)throws Exception{
@@ -53,13 +50,24 @@ public class ECommerceViewController {
 		return price;
 	}
 	
-	public static void insertCart(String productName,String qnty) throws PSQLException, Exception {
+	public static void insertCart(String name,String qnty) throws PSQLException, Exception {
 		try {
-			CartDAO.insert(productName,qnty);
+			CartDAO.insert(name,qnty);
 		} catch (PSQLException e) {
 			throw e;
 		} catch (Exception e) {
 			throw e;
+		}
+	}
+	public static List<Cart> viewSelectAll() throws Exception {
+		List<Cart> list = CartDAO.selectAll();
+		return list;
+	}
+	public static void viewDelete(String name) {
+		try {
+			CartDAO.delete(name);
+		} catch (Exception e) {
+			e.printStackTrace();
 		}
 	}
 	public static void insertOrder(String name,String qnty,String price,String total) throws PSQLException, Exception {
@@ -71,10 +79,10 @@ public class ECommerceViewController {
 			throw e;
 		}
 	}
-	
-	public static List<Cart> viewSelectAll() throws Exception {
-		List<Cart> list = CartDAO.selectAll();
+	public static List<Order> viewOrderSelect() throws Exception {
+		List<Order> list = OrderDAO.selectAllOrder();
 		return list;
 	}
+	
 
 }
